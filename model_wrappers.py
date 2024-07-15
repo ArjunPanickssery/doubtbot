@@ -1,5 +1,4 @@
 import os
-from typing import List
 
 from dotenv import load_dotenv
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -60,7 +59,7 @@ Here's a critique of the proposed solution: {critique}
 Do you think the solution is correct? (Yes/No)"""
 
     CRITIC_PROMPT = """You are given the following question and an incorrect answer.
-     
+
 Question: {question}
 
 Incorrect Answer: {answer_numeric}
