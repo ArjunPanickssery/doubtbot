@@ -40,4 +40,4 @@ if __name__ == "__main__":
     train_data, test_data = load_data()
     # critic = Llama2Wrapper("llama2_7b", "meta-llama/Llama-2-7b-chat-hf")
     critic = judge = Llama3Wrapper("llama3_8b", "meta-llama/Meta-Llama-3-8B-Instruct")
-    run_critic_eval(critic, judge, train_data[:5], "results.json")
+    run_critic_eval(critic, judge, train_data, "results_v1.json")

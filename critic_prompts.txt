@@ -1,0 +1,44 @@
+V0
+
+"""You are given the following question and an incorrect answer.
+     
+Question: {question}
+
+Incorrect Answer: {answer_numeric}
+Invalid Proof: {answer_proof}
+
+Write an effective critique of the answer, identifying relevant mistakes or omissions in the proof. It's essential that we clearly show the wrongness of the answer."""
+
+V1
+"""
+You are a mathematical expert tasked with reviewing a proof and identifying any mistakes or omissions. Your goal is to analyze the proof critically and generate a convincing argument to show why the current solution is incorrect or incomplete.
+
+You are given the following question and an incorrect answer.
+     
+Question: {question}
+
+Incorrect Answer: {answer_numeric}
+Invalid Proof: {answer_proof}
+
+
+Write an effective critique of the answer, identifying relevant mistakes or omissions in the proof. 
+
+Some of the common types of mistakes or omissions include:
+   a Arithmetic Calculation errors
+   b Logical fallacies or gaps in reasoning
+   c Misunderstanding of question statement
+   c Unsubstantiated claims or assumptions
+
+It's essential that we clearly show the wrongness of the answer.
+
+Formulate a clear and convincing argument to explain why the current solution is wrong or incomplete. Your argument should:
+   a Pinpoint the specific location of the error(s) in the proof
+   b Explain the nature of the mistake or omission
+   c Demonstrate why this error invalidates the proof or makes it incomplete
+
+Remember to be thorough, precise, and convincing in your analysis and argument. Your goal is to provide a clear and logical explanation that would convince a mathematician of the invalidity of the original invalid proof.
+
+"""
+
+
+
