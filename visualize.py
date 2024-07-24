@@ -1,8 +1,8 @@
 import json
 
-FILENAME = 'results_v1.json'
-LINEGRAPHNAME = 'result_v1.png'
-DISTPLOTNAME = 'difference_v1.png'
+FILENAME = 'results_v2.json'
+LINEGRAPHNAME = 'result_v2.png'
+DISTPLOTNAME = 'difference_v2.png'
 
 f = open(FILENAME)
 r = json.load(f)

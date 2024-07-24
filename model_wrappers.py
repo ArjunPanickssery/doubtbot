@@ -59,34 +59,46 @@ Here's a critique of the proposed solution: {critique}
 
 Do you think the solution is correct? (Yes/No)"""
 
-    CRITIC_PROMPT = """
-You are a mathematical expert tasked with reviewing a proof and identifying any mistakes or omissions. Your goal is to analyze the proof critically and generate a convincing argument to show why the current solution is incorrect or incomplete.
+    CRITIC_PROMPT = """You are provided with a mathematical question, a proof, and an answer. Your task is to carefully analyze the proof and the answer, identify any errors or flaws, and explain why the proof is invalid. Additionally, you must convince me that the answer is incorrect. Structure your response in the following manner:
 
-You are given the following question and an incorrect answer.
-     
+Restate the Question: Briefly summarize the mathematical question for clarity.
+Proof Analysis:
+Identify Errors: Point out specific steps or logical inconsistencies in the proof that make it invalid.
+Explain Errors: Provide detailed explanations of why these errors occur and how they impact the validity of the proof.
+Answer Evaluation:
+Identify Incorrect Answer: Clearly state why the provided answer is wrong.
+Provide Correct Answer (if possible): If applicable, give the correct answer with a brief explanation or correct steps.
+Example Input:
+
+Math Question: "Weng earns $12 an hour for babysitting. Yesterday, she just did 50 minutes of babysitting. How much did she earn?"
+Proof: "Weng earns 12/60 = $0.2 per minute.\nWorking 50 minutes, she earned 0.2 x 50 = $10"
+Answer: 10.0
+
+Example Output:
+
+Restate the Question: The question asks how much Weng earned for babysitting 50 minutes at a rate of $12 per hour.
+
+Proof Analysis:
+
+Identify Errors: The proof incorrectly calculates the earnings per minute and multiply instead of add to find the total earnings.
+Explain Errors:
+The correct approach should first determine the per-minute rate by dividing the hourly rate by 60 minutes.
+The proof mistakenly states the per-minute rate correctly as $0.2 but then multiply this rate directly to the number of minutes worked instead of adding.
+The error is in the step: "Working 50 minutes, she earned 0.2 x 50 = $10" Here, the correct operation is to add the per-minute rate by the total minutes worked, not add.
+
+Answer Evaluation:
+
+Identify Incorrect Answer: The provided answer, $10.0, is incorrect due to the flawed calculation method.
+Provide Correct Answer: The correct calculation should be:
+Weng earns 12/60 = $0.2 per minute.\nWorking 50 minutes, she earned 0.2 + 50 = $50.2
+Therefore, the correct answer is $50.2, not $10.0.
+
 Question: {question}
 
 Incorrect Answer: {answer_numeric}
 Invalid Proof: {answer_proof}
 
-
-Write an effective critique of the answer, identifying relevant mistakes or omissions in the proof. 
-
-Some of the common types of mistakes or omissions include:
-   a Arithmetic Calculation errors
-   b Logical fallacies or gaps in reasoning
-   c Misunderstanding of question statement
-   c Unsubstantiated claims or assumptions
-
-It's essential that we clearly show the wrongness of the answer.
-
-Formulate a clear and convincing argument to explain why the current solution is wrong or incomplete. Your argument should:
-   a Pinpoint the specific location of the error(s) in the proof
-   b Explain the nature of the mistake or omission
-   c Demonstrate why this error invalidates the proof or makes it incomplete
-
-Remember to be thorough, precise, and convincing in your analysis and argument. Your goal is to provide a clear and logical explanation that would convince a mathematician of the invalidity of the original invalid proof.
-
+Use this structured approach to provide a detailed and convincing explanation of why the proof is invalid and why the answer is wrong.
 """
 
     def __init__(self, model_id: str, model_name: str):
