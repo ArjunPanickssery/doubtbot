@@ -1,11 +1,12 @@
+# model_wrappers.py
 import os
 from typing import Tuple
 from timeit import default_timer as timer
 import torch
-from dotenv import load_dotenv
 from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer
+import requests
 
-from data import DatasetItem
+from dotenv import load_dotenv
 
 load_dotenv()
 HF_TOKEN = os.getenv("HF_TOKEN")
@@ -151,17 +152,13 @@ Write a solution to the question. Your solution should be a number and a proof t
 
     def answer_question(self, question: str) -> Tuple[float, str]:
         unfomatted_prompt = self.ANSWER_PROMPT.format(question=question)
-        print(f"Prompt: {unfomatted_prompt}")
         full_prompt = self._format_answer_prompt(unfomatted_prompt)
-        print(f"Full prompt: {full_prompt}")
         input_ids = self.tokenizer.encode(full_prompt, return_tensors="pt").to(
             self.model.device
         )
-        print(f"Input IDs: {input_ids}")
         start = timer()
         output = self.model.generate(input_ids, max_length=MAX_LENGTH)
         end = timer()
-        print(f"Output: {output}")
         print(f"Generated in {end - start} seconds")
         decoded = self.tokenizer.decode(output[0], skip_special_tokens=True)
         print(f"Decoded: {decoded}")
