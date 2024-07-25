@@ -61,26 +61,35 @@ def transform_to_dataset_item(data: List[dict]) -> List[DatasetItem]:
 
 def transform_to_question_answer_pair(
     data: List[DatasetItem],
+    *,
+    include_correct: bool = True,
+    include_incorrect: bool = True,
 ) -> List[QuestionAnswerPair]:
     """Transforms a list of DatasetItems into a list of QuestionAnswerPairs"""
-    return [
-        pair
-        for item in data
-        for pair in [
-            QuestionAnswerPair(
-                question=item.question,
-                answer_numeric=item.answer_correct.numeric,
-                answer_proof=item.answer_correct.proof,
-                correct=True,
-            ),
-            QuestionAnswerPair(
-                question=item.question,
-                answer_numeric=item.answer_incorrect.numeric,
-                answer_proof=item.answer_incorrect.proof,
-                correct=False,
-            ),
-        ]
-    ]
+    result = []
+
+    for item in data:
+        if include_correct:
+            result.append(
+                QuestionAnswerPair(
+                    question=item.question,
+                    answer_numeric=item.answer_correct.numeric,
+                    answer_proof=item.answer_correct.proof,
+                    correct=True,
+                )
+            )
+
+        if include_incorrect:
+            result.append(
+                QuestionAnswerPair(
+                    question=item.question,
+                    answer_numeric=item.answer_incorrect.numeric,
+                    answer_proof=item.answer_incorrect.proof,
+                    correct=False,
+                )
+            )
+
+    return result
 
 
 def load_data() -> tuple[List[DatasetItem], List[DatasetItem]]:
