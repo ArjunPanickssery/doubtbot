@@ -1,0 +1,44 @@
+[
+    {
+        "index": 16,
+        "question": "The profit from a business transaction is shared among 2 business partners, Mike and Johnson in the ratio 2:5 respectively. If Johnson got $2500, how much will Mike have after spending some of his share on a shirt that costs $200?",
+        "raw_response": "\n         <proof>\nLet's say the total profit is x. Since the profit is shared in the ratio 2:5, we can set up the equation:\n\n2/7 * x = Mike's profit and 5/7 * x = Johnson's profit\n\nWe know that Johnson's profit is $2500, so we can set up the equation:\n\n5/7 * x = 2500\n\nTo solve for x, we can multiply both sides by 7/5:\n\nx = 2500 * (7/5) = 3500\n\nSo the total profit is $3500. Since the ratio is 2:5, Mike's profit is 2/7 of the total profit:\n\nMike's profit = 2/7 * 3500 = 1000\n\nAfter spending $200 on a shirt, Mike will be left with:\n\n1000 - 200 = 800\n\n</proof>\n<nomic_answer>800</numeric_answer>",
+        "error": "Could not find numeric answer in the response",
+        "error_type": "format_error"
+    },
+    {
+        "index": 29,
+        "question": "Mrs. Snyder used to spend 40% of her monthly income on rent and utilities. Her salary was recently increased by $600 so now her rent and utilities only amount to 25% of her monthly income. How much was her previous monthly income?",
+        "raw_response": "\n         Let's call Mrs. Snyder's previous monthly income \"x\". Since she spent 40% of her income on rent and utilities, we can write:\n\n0.4x = rent and utilities\n\nAfter her salary increase, her rent and utilities are 25% of her new income, which is x + 600. We can write:\n\n0.25(x + 600) = rent and utilities\n\nSince rent and utilities are the same in both cases, we can set up the equation:\n\n0.4x = 0.25(x + 600)\n\nTo solve for x, we can first distribute the 0.25 to the terms inside the parentheses:\n\n0.4x = 0.25x + 150\n\nSubtract 0.25x from both sides to get:\n\n0.15x = 150\n\nDivide both sides by 0.15 to solve for x:\n\nx = 1000\n\n</proof>\n<numeric_answer>1000</numeric_answer>",
+        "error": "Could not find proof in the response",
+        "error_type": "format_error"
+    },
+    {
+        "index": 38,
+        "question": "Artemis is making tea for a party. She knows her mom drinks an 8-ounce cup of tea and uses one ounce of tea. She will use this same ratio for the party. The party has 12 people there and each of them wants a 6-ounce cup of tea. How many ounces of tea does she need?",
+        "raw_response": "\n         Artemis's mom drinks 8 ounces of tea with 1 ounce of tea, so the ratio of tea to cup is 1:8. For the party, each person wants a 6-ounce cup of tea, so the ratio of tea to cup is still 1:8, but the cup size is different. Let's call the number of ounces of tea needed \"x\". Then, the ratio of tea to cup is 1:x, and we know that 1/x = 1/8. Solving for x, we get:\n\nx = 8\n\nSince each person wants a 6-ounce cup of tea, and there are 12 people, the total number of ounces of tea needed is:\n\n12 * 6 = 72\n\nHowever, we also need to account for the tea Artemis's mom will use. Since she drinks 8 ounces of tea, and the ratio of tea to cup is 1:8, she will use 1 ounce of tea. Therefore, the total number of ounces of tea needed is:\n\n72 + 1 = 73\n\nHowever, we are asked to find the number of ounces of tea Artemis needs, not the total number of ounces of tea. Since Artemis's mom will use 1 ounce of tea, we subtract 1 from the total to get:\n\n73 - 1 = 72\n\nSo, Artemis needs 72 ounces of tea.\n\n</proof>\n<numeric_answer>72</numeric_answer>",
+        "error": "Could not find proof in the response",
+        "error_type": "format_error"
+    },
+    {
+        "index": 54,
+        "question": "Leah earned $28 working odd jobs around the neighborhood. She spent a seventh of it on a milkshake and put half of the rest in her savings account. She left the remaining money in her wallet. Her dog got ahold of her wallet and shredded all the money inside but $1. How many dollars did Leah lose?",
+        "raw_response": "\n         Leah earned $28, spent a seventh of it on a milkshake, and put half of the rest in her savings account. That means she spent 1/7 * 28 = 4 dollars on the milkshake and 28 - 4 = 24 dollars left. She put half of that 24 dollars in her savings account, which is 24/2 = 12 dollars. So she had 24 - 12 = 12 dollars left in her wallet. The dog shredded all the money except for 1 dollar, so she lost 12 - 1 = 11 dollars.\n</proof>\n<numeric_answer>11</numeric_answer>",
+        "error": "Could not find proof in the response",
+        "error_type": "format_error"
+    },
+    {
+        "index": 63,
+        "question": "Shawna's workout goal is 30 situps. On Monday, Shawna was only able to do 12 situps, so she decided that she would make up for the rest on Tuesday. However, she was only able to do 19 situps on Tuesday. How many situps would Shawna have to do on Wednesday to meet her minimum goal and make up for the ones she didn't do?",
+        "raw_response": "\n         Shawna's goal is to do 30 situps, and she did 12 on Monday. So, she still needs to do 30 - 12 = 18 situps. On Tuesday, she did 19 situps, which is more than the remaining 18 situps she needs. So, she already has enough to meet her goal. In fact, she has 19 - 18 = 1 extra situp.\n\n\n         To make up for the extra situp, Shawna would need to do 1 situp on Wednesday.\n\n\n<numeric_answer>1</numeric_answer>",
+        "error": "Could not find proof in the response",
+        "error_type": "format_error"
+    },
+    {
+        "index": 66,
+        "question": "Tara has been planning to buy a laptop which costs $1000. A computer shop accepts payment in installments of $65 per month provided that a 20% down payment is made. If Tara wants to pay an additional $20 for the down payment, how much will her balance be after paying for 4 months?",
+        "raw_response": "\n        \n\n\nLet's first find the amount of the down payment. Tara wants to pay an additional $20, so she will pay 20% of $1000 + $20 = 1.2% of $1000 + $20. The 20% of $1000 is $200, so she will pay 1.2% of $1000 + $20 = 0.012*1000 + 20 = 12 + 20 = $32. The total down payment is $200 + $32 = $232.\n\nThe amount she needs to pay in installments is $1000 - $232 = $768.\n\nEach installment is $65, so after 4 months she will have paid 4*65 = $260. The remaining balance will be $768 - $260 = $508.\n\n</proof>\n<numeric_answer>508</numeric_answer>",
+        "error": "Could not find proof in the response",
+        "error_type": "format_error"
+    }
+]
