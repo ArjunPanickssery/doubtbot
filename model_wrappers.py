@@ -1,7 +1,9 @@
 import os
-
+from typing import Tuple
+from timeit import default_timer as timer
+import torch
 from dotenv import load_dotenv
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer
 
 from data import DatasetItem
 
@@ -38,6 +40,10 @@ class ModelWrapper:
     ) -> str:
         raise NotImplementedError
 
+    # For answerers
+    def answer_question(self, question: str) -> Tuple[float, str]:
+        raise NotImplementedError
+
 
 class HuggingFaceWrapper(ModelWrapper):
     JUDGE_PROMPT_WITHOUT_CRITIQUE = """Here's a math question: {question}
@@ -67,6 +73,10 @@ Invalid Proof: {answer_proof}
 
 Write an effective critique of the answer, identifying relevant mistakes or omissions in the proof. It's essential that we clearly show the wrongness of the answer."""
 
+    ANSWER_PROMPT = """Here's a math question: {question}
+
+Write a solution to the question. Your solution should be a number and a proof that explains how you arrived at that number."""
+
     def __init__(self, model_id: str, model_name: str):
         super().__init__(model_id, model_name)
         self.model = AutoModelForCausalLM.from_pretrained(
@@ -81,6 +91,9 @@ Write an effective critique of the answer, identifying relevant mistakes or omis
         raise NotImplementedError
 
     def _format_judge_prompt(self, unformatted_prompt: str) -> str:
+        raise NotImplementedError
+
+    def _format_answer_prompt(self, unformatted_prompt: str) -> str:
         raise NotImplementedError
 
     def _extract_critique_from_response(self, response: str) -> str:
@@ -136,6 +149,25 @@ Write an effective critique of the answer, identifying relevant mistakes or omis
         response = self._extract_critique_from_response(decoded)
         return response
 
+    def answer_question(self, question: str) -> Tuple[float, str]:
+        unfomatted_prompt = self.ANSWER_PROMPT.format(question=question)
+        print(f"Prompt: {unfomatted_prompt}")
+        full_prompt = self._format_answer_prompt(unfomatted_prompt)
+        print(f"Full prompt: {full_prompt}")
+        input_ids = self.tokenizer.encode(full_prompt, return_tensors="pt").to(
+            self.model.device
+        )
+        print(f"Input IDs: {input_ids}")
+        start = timer()
+        output = self.model.generate(input_ids, max_length=MAX_LENGTH)
+        end = timer()
+        print(f"Output: {output}")
+        print(f"Generated in {end - start} seconds")
+        decoded = self.tokenizer.decode(output[0], skip_special_tokens=True)
+        print(f"Decoded: {decoded}")
+        # TODO: Extract the numeric answer from the response
+        return decoded
+
 
 class WizardMathWrapper(HuggingFaceWrapper):
     def _format_critique_prompt(self, unformatted_prompt: str):
@@ -148,6 +180,9 @@ class WizardMathWrapper(HuggingFaceWrapper):
     def _format_judge_prompt(self, unformatted_prompt: str) -> str:
         return f"Below is an instruction that describes a task. Write a response that appropriately completes the request.\n\n### Instruction:\n{unformatted_prompt}\n\n### Response: ("
 
+    def _format_answer_prompt(self, unformatted_prompt: str) -> str:
+        return f"Below is an instruction that describes a task. Write a response that appropriately completes the request.\n\n### Instruction:\n{unformatted_prompt}\n\n### Response:"
+
     def _extract_critique_from_response(self, response: str) -> str:
         return response.split("Response:")[1].strip()
 
@@ -157,6 +192,7 @@ class Llama2Wrapper(HuggingFaceWrapper):
     CRITIC_WORDS_IN_MOUTH = "Sure, here's my critique:\n\n"
     CRITIC_SYSTEM_PROMPT = "You're a math expert who critiques math problems."
     JUDGE_SYSTEM_PROMPT = "You're a judge who evaluates math problems."
+    ANSWERER_SYSTEM_PROMPT = "You're a math expert who answers math problems."
 
     def _format_critic_prompt(self, unformatted_prompt: str):
         return f"""<s>[INST] <<SYS>>
@@ -170,6 +206,12 @@ class Llama2Wrapper(HuggingFaceWrapper):
         <</SYS>>
         {unformatted_prompt} [/INST] (""".strip()
 
+    def _format_answer_prompt(self, unformatted_prompt: str):
+        return f"""<s>[INST] <<SYS>>
+        {self.ANSWERER_SYSTEM_PROMPT}
+        <</SYS>>
+        {unformatted_prompt} [/INST]""".strip()
+
     def _extract_critique_from_response(self, response: str) -> str:
         return response.split("critique:\n\n")[1].strip()
 
@@ -179,6 +221,7 @@ class Llama3Wrapper(HuggingFaceWrapper):
     CRITIC_WORDS_IN_MOUTH = "Sure, here's my critique:\n\n"
     CRITIC_SYSTEM_PROMPT = "You're a math expert who critiques math problems."
     JUDGE_SYSTEM_PROMPT = "You're a judge who evaluates math problems."
+    ANSWERER_SYSTEM_PROMPT = "You're a math expert who answers math problems."
 
     def _format_critic_prompt(self, unformatted_prompt: str):
         return f"""<|begin_of_text|><|start_header_id|>system<|end_header_id|>
@@ -198,6 +241,14 @@ class Llama3Wrapper(HuggingFaceWrapper):
 
 ("""
 
+    def _format_answer_prompt(self, unformatted_prompt: str):
+        return f"""<|begin_of_text|><|start_header_id|>system<|end_header_id|>
+
+{self.ANSWERER_SYSTEM_PROMPT}<|eot_id|><|start_header_id|>user<|end_header_id|>
+
+{unformatted_prompt}<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+        """
+
     def _extract_critique_from_response(self, response: str) -> str:
         return response.split("critique:\n\n")[1].strip()
 
@@ -211,6 +262,9 @@ class Gemma2Wrapper(HuggingFaceWrapper):
 
     def _format_judge_prompt(self, unformatted_prompt: str):
         return f"""<start_of_turn>user\n{unformatted_prompt}<end_of_turn>\n<start_of_turn>model\n("""
+
+    def _format_answer_prompt(self, unformatted_prompt: str):
+        return f"""<start_of_turn>user\n{unformatted_prompt}<end_of_turn>\n<start_of_turn>model\n"""
 
     def _extract_argument_from_response(self, response: str) -> str:
         return response.split(" critique:")[1].strip()
