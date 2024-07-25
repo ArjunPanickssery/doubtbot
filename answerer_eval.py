@@ -65,7 +65,7 @@ def evaluate_baseline(
                 {
                     "index": i,
                     "question": item.question,
-                    "raw_response": None,
+                    "raw_response": response,
                     "error": str(e),
                     "error_type": "format_error",
                 }

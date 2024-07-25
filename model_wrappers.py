@@ -16,13 +16,14 @@ MAX_LENGTH = 1024
 
 def parse_answer_and_proof(content: str) -> Tuple[float, str]:
     proof_match = re.search(r"<proof>(.*?)</proof>", content, re.DOTALL)
+    if not proof_match:
+        raise RuntimeError("Could not find proof in the response")
     # Sometimes the LLM misses off the closing tag, so we take the answer even if it ends in whitespace then the end of the string
     answer_match = re.search(
         r"<numeric_answer>(.*?)(?:</numeric_answer>|\s*$)", content, re.DOTALL
     )
-
-    if not proof_match or not answer_match:
-        raise RuntimeError("Could not find proof or numeric answer in the response")
+    if not answer_match:
+        raise RuntimeError("Could not find numeric answer in the response")
 
     proof = proof_match.group(1).strip()
     try:
