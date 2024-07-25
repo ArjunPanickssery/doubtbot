@@ -9,37 +9,81 @@ from data import (
     transform_to_question_answer_pair,
 )
 from model_wrappers import (
+    parse_answer_and_proof,
     Llama2Wrapper,
     Llama3Wrapper,
 )
 
 
 def evaluate_baseline(
-    model: Llama3Wrapper, dataset: List[QuestionAnswerPair], output_file: str
+    model: Llama3Wrapper,
+    dataset: List[QuestionAnswerPair],
+    output_file: str,
+    error_file: str,
 ):
     results = []
+    errors = []
     for i, item in enumerate(tqdm(dataset)):
-        print(f"Evaluating item {i} / {len(dataset)}: {item.question}")
         try:
-            predicted_answer, predicted_proof = model.answer_question(item.question)
-            is_correct = abs(predicted_answer - item.answer_numeric) < 1e-6
+            response = model.answer_question(item.question)
         except Exception as e:
-            print(f"Error: {e}")
-            predicted_answer = None
-            predicted_proof = None
-            is_correct = False
-
-        result = {
-            "question": item.question,
-            "correct_answer": item.answer_numeric,
-            "correct_proof": item.answer_proof,
-            "predicted_answer": predicted_answer,
-            "predicted_proof": predicted_proof,
-            "is_correct": is_correct,
-        }
-        results.append(result)
+            results.append(
+                {
+                    "index": i,
+                    "question": item.question,
+                    "correct_answer": item.answer_numeric,
+                    "correct_proof": item.answer_proof,
+                    "predicted_answer": None,
+                    "predicted_proof": None,
+                    "is_correct": False,
+                }
+            )
+            errors.append(
+                {
+                    "index": i,
+                    "question": item.question,
+                    "raw_response": None,
+                    "error": str(e),
+                    "error_type": "model_error",
+                }
+            )
+        try:
+            predicted_answer, predicted_proof = parse_answer_and_proof(response)
+            results.append(
+                {
+                    "index": i,
+                    "question": item.question,
+                    "correct_answer": item.answer_numeric,
+                    "correct_proof": item.answer_proof,
+                    "predicted_answer": predicted_answer,
+                    "predicted_proof": predicted_proof,
+                    "is_correct": abs(predicted_answer - item.answer_numeric) < 1e-6,
+                }
+            )
+        except Exception as e:
+            errors.append(
+                {
+                    "index": i,
+                    "question": item.question,
+                    "raw_response": None,
+                    "error": str(e),
+                    "error_type": "format_error",
+                }
+            )
+            results.append(
+                {
+                    "index": i,
+                    "question": item.question,
+                    "correct_answer": item.answer_numeric,
+                    "correct_proof": item.answer_proof,
+                    "predicted_answer": None,
+                    "predicted_proof": None,
+                    "is_correct": False,
+                }
+            )
 
     save_to_json(results, output_file)
+    save_to_json(errors, error_file)
 
     accuracy = sum(1 for r in results if r["is_correct"]) / len(results)
 
@@ -58,6 +102,9 @@ if __name__ == "__main__":
 
     print("Evaluating on a subset of training data...")
     train_accuracy = evaluate_baseline(
-        model, question_answer_pairs, "results/answerer_baseline_train_subset.json"
+        model,
+        question_answer_pairs,
+        "results/answerer_baseline_train_subset.json",
+        "results/answerer_baseline_train_subset_errors.json",
     )
     print(f"Baseline accuracy on training subset: {train_accuracy:.2%}")

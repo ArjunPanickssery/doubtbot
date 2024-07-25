@@ -167,6 +167,7 @@ Therefore, Natalia sold a total of 48 clips in April and 24 clips in May.
             # torch_dtype=torch.bfloat16
         )
         self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+        self.model.generation_config.pad_token_id = self.tokenizer.pad_token_id
 
     def _format_critic_prompt(self, unformatted_prompt: str):
         raise NotImplementedError
@@ -180,9 +181,7 @@ Therefore, Natalia sold a total of 48 clips in April and 24 clips in May.
     def _extract_critique_from_response(self, response: str) -> str:
         raise NotImplementedError
 
-    def _extract_answer_and_proof_from_response(
-        self, response: str
-    ) -> Tuple[float, str]:
+    def _extract_answer_and_proof_from_response(self, response: str) -> str:
         raise NotImplementedError
 
     def get_judge_confidence(
@@ -235,18 +234,14 @@ Therefore, Natalia sold a total of 48 clips in April and 24 clips in May.
         response = self._extract_critique_from_response(decoded)
         return response
 
-    def answer_question(self, question: str) -> Tuple[float, str]:
+    def answer_question(self, question: str) -> str:
         unfomatted_prompt = self.ANSWER_PROMPT.format(question=question)
         full_prompt = self._format_answer_prompt(unfomatted_prompt)
         input_ids = self.tokenizer.encode(full_prompt, return_tensors="pt").to(
             self.model.device
         )
-        start = timer()
         output = self.model.generate(input_ids, max_length=MAX_LENGTH)
-        end = timer()
-        print(f"Generated in {end - start} seconds")
         decoded = self.tokenizer.decode(output[0], skip_special_tokens=True)
-        print(f"Decoded: {decoded}")
         return self._extract_answer_and_proof_from_response(decoded)
 
 
@@ -267,10 +262,8 @@ class WizardMathWrapper(HuggingFaceWrapper):
     def _extract_critique_from_response(self, response: str) -> str:
         return response.split("Response:", 1)[1].strip()
 
-    def _extract_answer_and_proof_from_response(
-        self, response: str
-    ) -> Tuple[float, str]:
-        return parse_answer_and_proof(response.split("Response:\n\n", 1)[1])
+    def _extract_answer_and_proof_from_response(self, response: str) -> str:
+        return response.split("Response:", 1)[1].strip()
 
 
 # meta-llama/Llama-2-7b-chat-hf, etc
@@ -302,10 +295,8 @@ class Llama2Wrapper(HuggingFaceWrapper):
     def _extract_critique_from_response(self, response: str) -> str:
         return response.split("critique:\n\n")[1].strip()
 
-    def _extract_answer_and_proof_from_response(
-        self, response: str
-    ) -> Tuple[float, str]:
-        return parse_answer_and_proof(response.split("answer:\n\n", 2)[2])
+    def _extract_answer_and_proof_from_response(self, response: str) -> str:
+        return response.split("answer:\n\n", 2)[2]
 
 
 # meta-llama/Meta-Llama-3-8B-Instruct, etc
@@ -347,10 +338,8 @@ class Llama3Wrapper(HuggingFaceWrapper):
     def _extract_critique_from_response(self, response: str) -> str:
         return response.split("critique:\n\n")[1].strip()
 
-    def _extract_answer_and_proof_from_response(
-        self, response: str
-    ) -> Tuple[float, str]:
-        return parse_answer_and_proof(response.split("answer:\n\n", 2)[2])
+    def _extract_answer_and_proof_from_response(self, response: str) -> str:
+        return response.split("answer:\n\n", 2)[2]
 
 
 # google/gemma-2-9b, google/gemma-2-27b
@@ -370,7 +359,5 @@ class Gemma2Wrapper(HuggingFaceWrapper):
     def _extract_critique_from_response(self, response: str) -> str:
         return response.split(" critique:")[1].strip()
 
-    def _extract_answer_and_proof_from_response(
-        self, response: str
-    ) -> Tuple[float, str]:
-        return parse_answer_and_proof(response.split("answer:\n\n", 2)[2])
+    def _extract_answer_and_proof_from_response(self, response: str) -> str:
+        return response.split("answer:\n\n", 2)[2]
