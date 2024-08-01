@@ -1,15 +1,16 @@
 import dataclasses
 from typing import List
+import os
 
 from model_wrappers import (
-    HuggingFaceWrapper,
+    ModelWrapper,
     Llama2Wrapper,
     Llama3Wrapper,
-    ModelWrapper,
+    GPTWrapper
 )
 from tqdm import tqdm
 
-from data import QuestionAnswerPair, load_data, save_to_json
+from data import QuestionAnswerPair, transform_to_question_answer_pair,load_data, save_to_json
 
 
 def run_critic_eval(
@@ -38,6 +39,17 @@ def run_critic_eval(
 
 if __name__ == "__main__":
     train_data, test_data = load_data()
-    # critic = Llama2Wrapper("llama2_7b", "meta-llama/Llama-2-7b-chat-hf")
-    critic = judge = Llama3Wrapper("llama3_8b", "meta-llama/Meta-Llama-3-8B-Instruct")
-    run_critic_eval(critic, judge, train_data[:5], "results.json")
+    sample = transform_to_question_answer_pair(train_data[:100])
+
+    gpt4o = GPTWrapper("gpt4o", "gpt-4o-2024-05-13")
+    gpt35_turbo = GPTWrapper("gpt35_turbo", "gpt-3.5-turbo-0125")
+    llama2_7b = Llama2Wrapper("llama2_7b", "meta-llama/Llama-2-7b-chat-hf")
+    llama3_8b = Llama3Wrapper("llama3_8b", "meta-llama/Meta-Llama-3-8B-Instruct")
+    
+    models = [gpt4o, gpt35_turbo, llama2_7b, llama3_8b]
+    for i in range(len(models)):
+        critic = models[i]
+        for judge in models[i + 1 :]:
+            output_file = f"no_solver_results/{critic.model_id}_{judge.model_id}.json"
+            if not os.path.exists(output_file):
+                run_critic_eval(critic, judge, sample, output_file)
